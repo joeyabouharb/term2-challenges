@@ -18,6 +18,13 @@ class Vector():
             return NotImplemented
 
         return Vector(total_x,total_y)
+    def __sub__(self, other):
+        if isinstance(other, Vector):
+            total_x = self.x - other.x
+            total_y = self.y - other.y
+        else:
+            return NotImplemented
+        return Vector(total_x, total_y)
 
     def __mul__(self, other):
         if isinstance(other, float) or isinstance(other, int):
@@ -31,5 +38,6 @@ class Vector():
         return pow(self.x, 2) + pow(self.y, 2)
 
     def __iter__(self):
-        return iter([self.x, self.y])
+        for value in self.__dict__.values():
+            yield value
 
