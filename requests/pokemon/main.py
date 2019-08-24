@@ -16,7 +16,10 @@ def main():
         elif command == "pokemon":
             c = Client()
             total = len(c.pokemon)
-            print(f'There are {total} pokemon')
+            if total:
+                print(f'There are {total} pokemon')
+            else:
+                print('Connection Error. ')
         elif command == "exit":
             exit_flag = True
 
