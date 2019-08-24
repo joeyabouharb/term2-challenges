@@ -15,6 +15,9 @@ class Client():
         pass
 
     def get_pokemon(self, limit=20, offset=0):
+        """
+        return all pokemon
+        """
         params = f'?limit={limit}&offset={offset}'
         r = requests.get(
             f'{self._URL}/pokemon/{params}'
@@ -24,16 +27,24 @@ class Client():
         else:
             print('Connection Error. ')
 
-    def find_by_id(self, id):
+
+    def find_by_id(self, pokeid):
+        """
+        find pokemon by id
+        """
         r = requests.get(
-            f'{self._URL}/pokemon/{id}'
+            f'{self._URL}/pokemon/{pokeid}'
         )
         if r.status_code == 200:
             self.pokemon = json.dumps(r.json(), indent=4)
         else:
             exit('connection error')
-    
+
+
     def find_by_name(self, name):
+        """
+        find pokemon by name
+        """
         r = requests.get(
             f'{self._URL}/pokemon/{name}'
         )
