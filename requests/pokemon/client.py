@@ -24,8 +24,10 @@ class Client():
         if r.status_code == 200:
             self.result = json.dumps(r.json()['results'], indent=2)
             self.count = r.json()['count']
+        elif r.status_code == 404:
+            exit(f'{item}. not found. exiting...')
         else:
-            exit('Connection Error. ')
+            exit('connection error, exiting')
 
 
     def find_by_id(self,item, pokeid):
@@ -37,9 +39,10 @@ class Client():
         )
         if r.status_code == 200:
             self.result = json.dumps(r.json(), indent=4)
+        elif r.status_code == 404:
+            exit(f'{item} with id {pokeid} not found. Exiting...')
         else:
-            exit('connection error')
-
+            exit('connection error occured, exiting. ')
 
     def find_by_name(self, item, name):
         """
@@ -51,7 +54,7 @@ class Client():
         if r.status_code == 200:
             self.result = json.dumps(r.json(), indent=4)
         elif r.status_code == 404:
-            exit('pokemon not found')
+            exit(f'{item} with name {name} not found, exiting.')
         else:
             exit('connection error!')
 if __name__ == '__main__':
