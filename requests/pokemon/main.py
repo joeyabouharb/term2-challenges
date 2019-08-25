@@ -3,7 +3,7 @@
 CLI for our pokemon app
 """
 import argparse
-from client import Client, MAX_POKEMON
+from client import Client
 
 
 def main(args):
@@ -14,32 +14,32 @@ def main(args):
 
     if args.subcommand == 'search':
         if args.id:
-            find_pokemon_by_id(c, args.id)
+            find_pokemon_by_id(c, args.id, args.item)
         elif args.name:
-            find_pokemon_by_name(c, args.name)
+            find_pokemon_by_name(c, args.name, args.item)
         else:
             exit('no search paramaters were entered! exiting...')
     elif args.subcommand == 'list':
-        retrieve_all_pokemon(c, args.limit)
+        retrieve_all_pokemon(c, args.limit, args.item)
 
 
-def find_pokemon_by_id(c, id):
+def find_pokemon_by_id(c, id, item):
     """
     find pokemon by id
     """
-    c.find_by_id(id)
-    print(c.pokemon)
+    c.find_by_id(item, id)
+    print(c.result)
 
 
-def find_pokemon_by_name(c, name):
+def find_pokemon_by_name(c, name, item):
     """
     find pokemon by name
     """
-    c.find_by_name(name)
-    print(c.pokemon)
+    c.find_by_name(item, name)
+    print(c.result)
 
 
-def retrieve_all_pokemon(c, limit):
+def retrieve_all_pokemon(c, limit, item):
     """
     retrieve all pokemon
     """
@@ -47,14 +47,16 @@ def retrieve_all_pokemon(c, limit):
     offset = 0
 
     while exit_flag ==  False:
-        c.get_pokemon(limit, offset)
-        print(c.pokemon)
+        c.get_all(item, limit, offset)
+        result = c.result
+        print(result)
         offset += limit
-
-        if offset > MAX_POKEMON:
+        if offset >= c.count:
             exit_flag = True
-        input('Press Enter to Retrieve More: ')
-
+        else:
+            command = input(f'Press Enter to Retrieve More or e to exit ot a for all ({offset}/{c.count} {item}s): ')
+            if command == 'e':
+                exit_flag = True
 
 
 if __name__ == '__main__':
@@ -69,7 +71,6 @@ if __name__ == '__main__':
             'to all known pokemon. gotta catch them all!'
         )
     )
-
     SUBCOMMAND = PARSER.add_subparsers(
         title='Subcommands',
         description='retrieve data from the pokedex',
@@ -80,22 +81,25 @@ if __name__ == '__main__':
     LIST = SUBCOMMAND.add_parser(
         name='list'
     )
+    LIST.add_argument('item', help='item type to list in the pokedex')
     LIST.add_argument(
         '--limit',
         type=int,
         help='limit search results per request',
-        default=20
+        default=964
     )
-    POKEMON = SUBCOMMAND.add_parser(name='search')
-    POKEMON.add_argument(
+    SEARCH = SUBCOMMAND.add_parser(name='search')
+    SEARCH.add_argument(
+        'item', help='item to search in the pokedex'
+    )
+    SEARCH.add_argument(
         '--id', help='search pokemon via id',
         type=int, default=0
     )
-    POKEMON.add_argument(
+    SEARCH.add_argument(
         '--name', help='search pokemon via name',
         type=str, default='',
     )
     ARGS = PARSER.parse_args()
-    
     main(ARGS)
 

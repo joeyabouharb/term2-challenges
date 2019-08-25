@@ -4,7 +4,6 @@ import requests
 import json
 
 
-MAX_POKEMON = 964
 class Client():
     """
     client service to interact with the api
@@ -14,46 +13,47 @@ class Client():
     def __init__(self):
         pass
 
-    def get_pokemon(self, limit=20, offset=0):
+    def get_all(self, item, limit=20, offset=0):
         """
         return all pokemon
         """
         params = f'?limit={limit}&offset={offset}'
         r = requests.get(
-            f'{self._URL}/pokemon/{params}'
+            f'{self._URL}/{item}{params}'
         )
         if r.status_code == 200:
-            self.pokemon = json.dumps(r.json()['results'], indent=2)
+            self.result = json.dumps(r.json()['results'], indent=2)
+            self.count = r.json()['count']
         else:
-            print('Connection Error. ')
+            exit('Connection Error. ')
 
 
-    def find_by_id(self, pokeid):
+    def find_by_id(self,item, pokeid):
         """
         find pokemon by id
         """
         r = requests.get(
-            f'{self._URL}/pokemon/{pokeid}'
+            f'{self._URL}/{item}/{pokeid}'
         )
         if r.status_code == 200:
-            self.pokemon = json.dumps(r.json(), indent=4)
+            self.result = json.dumps(r.json(), indent=4)
         else:
             exit('connection error')
 
 
-    def find_by_name(self, name):
+    def find_by_name(self, item, name):
         """
         find pokemon by name
         """
         r = requests.get(
-            f'{self._URL}/pokemon/{name}'
+            f'{self._URL}/{item}/{name}'
         )
         if r.status_code == 200:
-            self.pokemon = json.dumps(r.json(), indent=4)
+            self.result = json.dumps(r.json(), indent=4)
         elif r.status_code == 404:
             exit('pokemon not found')
         else:
             exit('connection error!')
 if __name__ == '__main__':
     c = Client()
-    c.pokemon
+    c.result
