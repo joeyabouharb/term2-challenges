@@ -20,7 +20,7 @@ def main(args):
         else:
             exit('no search paramaters were entered! exiting...')
     elif args.subcommand == 'list':
-        retrieve_all_pokemon(c, args.limit, args.item)
+        retrieve_all_pokemon(c, args.limit, args.offset,  args.item)
 
 
 def find_pokemon_by_id(c, id, item):
@@ -39,24 +39,13 @@ def find_pokemon_by_name(c, name, item):
     print(c.result)
 
 
-def retrieve_all_pokemon(c, limit, item):
+def retrieve_all_pokemon(c, limit, offset, item):
     """
     retrieve all pokemon
-    """
-    exit_flag = False
-    offset = 0
-
-    while exit_flag ==  False:
-        c.get_all(item, limit, offset)
-        result = c.result
-        print(result)
-        offset += limit
-        if offset >= c.count:
-            exit_flag = True
-        else:
-            command = input(f'Press Enter to Retrieve More or e to exit ot a for all ({offset}/{c.count} {item}s): ')
-            if command == 'e':
-                exit_flag = True
+"""
+    c.get_all(item, limit, offset)
+    result = c.result
+    print(result)
 
 
 if __name__ == '__main__':
@@ -87,6 +76,12 @@ if __name__ == '__main__':
         type=int,
         help='limit search results per request',
         default=964
+    )
+    LIST.add_argument(
+        '--offset',
+        type=int,
+        help='starting point for item listing',
+        default=0
     )
     SEARCH = SUBCOMMAND.add_parser(name='search')
     SEARCH.add_argument(
