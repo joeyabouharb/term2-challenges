@@ -3,19 +3,6 @@
 import requests
 import json
 
-class SearchItem:
-
-    def __init__(self, stats):
-        for key in stats.keys():
-            setattr(self, key, stats[key])
-
-    def toString(self):
-        out = ''
-        search_dict = list(self.__dict__.keys())
-        for key in search_dict:
-            out += f'{key}: {self.__dict__[key]}\n'
-        return out
-
 
 class Client():
     """
@@ -51,9 +38,7 @@ class Client():
             f'{self._URL}/{item}/{pokeid}'
         )
         if r.status_code == 200:
-            data = r.json()
-            item = SearchItem(data)
-            self.result = item.toString()
+            self.result = json.dumps(r.json(), indent=4)
         elif r.status_code == 404:
             exit(f'{item} with id {pokeid} not found. Exiting...')
         else:
