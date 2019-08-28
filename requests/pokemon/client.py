@@ -1,7 +1,9 @@
 
 
 import requests
+import requests_cache
 import json
+
 
 
 class Client():
@@ -11,11 +13,11 @@ class Client():
     _URL = "https://pokeapi.co/api/v2"
 
     def __init__(self):
-        pass
+        requests_cache.install_cache(cache_name='requests', backend='sqlite', expire_after=10000)
 
     def get_all(self, item, limit=20, offset=0):
         """
-        return all pokemon
+        return all items
         """
         params = f'?limit={limit}&offset={offset}'
         r = requests.get(
@@ -32,7 +34,7 @@ class Client():
 
     def find_by_id(self,item, pokeid):
         """
-        find pokemon by id
+        find item by id
         """
         r = requests.get(
             f'{self._URL}/{item}/{pokeid}'
@@ -44,9 +46,10 @@ class Client():
         else:
             exit('connection error occured, exiting. ')
 
+
     def find_by_name(self, item, name):
         """
-        find pokemon by name
+        find item by name
         """
         r = requests.get(
             f'{self._URL}/{item}/{name}'
@@ -57,6 +60,8 @@ class Client():
             exit(f'{item} with name {name} not found, exiting.')
         else:
             exit('connection error!')
+
+
 if __name__ == '__main__':
     c = Client()
     c.result
