@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import pygame
-from globals import *
+from game_globals import *
 
 class Game():
 

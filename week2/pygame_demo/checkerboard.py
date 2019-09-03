@@ -26,7 +26,7 @@ class Game():
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    self.running = False
                     pygame.quit()
                 self.screen.fill(self.BLACK)
                 x = 96

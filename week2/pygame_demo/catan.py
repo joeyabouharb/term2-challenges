@@ -35,17 +35,15 @@ class Game():
         pygame.display.flip()
 
 
-    def _draw_elements(self, n = 6):
-        pi2 = 2 * pi
-        radius = 50
-        x, y = (200, 200)
-        color = (0, 0, 255)
-        item = pygame.draw.polygon(self.screen, color, [
-            (x + radius * cos(2 * pi * i / n), y + radius * sin(2 * pi * i / n))
-            for i in range(n)
-        ])
-
-
+    def _draw_elements(self, n = 3):
+        a, b = (160, 100), (260, 100)
+        top = a[0] + (b[0] - a[0])/2
+        c = (top, 50)
+        d = (top, c[1] + a[1]/2 + 60 + c[1])
+        # pygame.draw.line(self.screen, RED, a, b)
+        pygame.draw.polygon(self.screen, RED, (a, b, c))
+        pygame.draw.rect(self.screen, RED, (*a, b[0] - a[0], 60))
+        pygame.draw.polygon(self.screen, RED, ((a[0], a[1] + 60), (b[0], b[1] + 60), d))
 def main():
 
     game = Game()
