@@ -3,104 +3,146 @@
 A game that makes a jumping mushroom
 """
 import pygame
-from game_globals import *  # defined list of game variables
+from pygame.locals import (
+    KEYDOWN, KEYUP,
+    K_SPACE, QUIT,
+    K_LEFT, K_RIGHT
+)
+from game_globals import (
+    RED, BLACK, WHITE, WIDTH, HEIGHT,
+    FONT_NAME, FONT_PX, FPS
+)  # defined list of game variables
 
-BORDER = 20
+def check_collision(floors, player):
+    results = []
+    for floor in floors:
+        results.append(
+            bool((
+                floor.rect.left <= player.left <= floor.rect.right
+                and floor.rect.bottom >= player.top >= floor.rect.top
+                ))
+        )
+    return results
+
+
 class Player():
     """
     defines the player object
     """
 
     def __init__(self, body_pos, body_size):
-
-        self.x_body, self.y_body = body_pos
-        self.w_body, self.h_body = body_size
+        self.pos = body_pos
+        self.size = body_size
         self.jump_state, self.max_jump = 0, 230
-        self.arc_width = 20
-        self.speed = 50
-        self.color = RED
         self.status = "jumped"
-        self.face = 'right'
+        self.face = 'none'
+        self.legs = None
+        self.trigger = False
+
+
     def draw(self, screen, level):
         """
         draw the player on the screen
         """
         self.legs = pygame.draw.rect(
             screen, RED,
-            (self.x_body, self.y_body, self.w_body, self.h_body)
+            (self.pos, self.size)
         )
         if not level.colliderect(self.legs):
             exit('you loose!')
 
-    def jump(self, floors):
+
+    def jump(self, floors, speed=40):
         """
         initiate a jumping movement by updating vertical position
         """
-        if any(\
-                 self.legs.top == floor.rect.top + floor.rect.height\
-            and self.legs.left >= floor.rect.left\
-            for floor in floors\
-        ):
-            print('shh')
+        collisions = check_collision(floors, self.legs)
+        if any(collisions):
             self.status = 'jumped'
         else:
-            print('bla')
-            player_dy = self.speed / FPS
-            self.y_body -= player_dy
+            player_dy = speed / FPS
+            self.pos[1] -= player_dy
 
 
-    def back_to_floor(self, floors):
+    def back_to_floor(self, floors, speed=40):
+        """
+        player falling to floor
+        """
         if any(self.legs.colliderect(floor.rect) for floor in floors):
-            self.status = 'stationary'
+            self.status = 'move'
+            if not self.trigger:
+                self.face = 'none'
         else:
-            player_dy = self.speed / FPS
-            self.y_body += player_dy
+            player_dy = speed / FPS
+            self.pos[1] += player_dy
 
 
 
-    def move(self, boundaries, floors):
+    def move(self, floors, boundaries, speed=50):
         """
         initiate player movement by updating current possition
         """
-        player_dx = self.speed / FPS
-        if not any(\
-            self.legs.colliderect(floor.rect)\
-            for floor in floors\
-        ) and not 'jump' in self.status:
-            self.status = 'stationary'
+        player_dx = speed / FPS
+        if all(
+            not self.legs.colliderect(floor.rect)
+            for floor in floors
+        ) and self.status == 'move':
+            self.status = 'jumped'
         elif self.status == 'move' or 'jump' in self.status:
             if self.face == 'right':
-                if boundaries[0].rect.colliderect(self.legs):
-                    print('collision')
+                if any(
+                    boundary.rect.colliderect(self.legs)
+                    for boundary in boundaries['right']
+                ):
+                    self.status = 'jumped'
+                    self.pos[0] -= player_dx
                 else:
-                    self.x_body += player_dx
-
+                    self.pos[0] += player_dx
             elif self.face == 'left':
-                if any(self.legs.colliderect(boundary) for boundary in boundaries):
-                    print('collision')
+                if any(
+                    boundary.rect.colliderect(self.legs)
+                    for boundary in boundaries['left']
+                ):
+                    self.status = 'jumped'
+                    self.pos[0] += player_dx
                 else:
-                    self.x_body -= player_dx
+                    self.pos[0] -= player_dx
 
 
 
 
 class Platform:
-    def __init__(self, pos, size, color=BLACK):
-        self.pos_x, self.pos_y = pos
-        self.size_width, self.size_height = size
+    """
+    game platforms and collision points
+    """
+    def __init__(self, pos, size, face='none', color=BLACK):
+        self.pos = pos
+        self.size = size
         self.color = color
         self.status = 'stationary'
-        self.face = 'none'
-
+        self.face = face
+        self.rect = None
 
     def draw(self, screen):
+        """
+        draw platform object
+        """
         self.rect = pygame.draw.rect(
             screen, self.color,
-            (self.pos_x, self.pos_y, self.size_width, self.size_height)
+            (self.pos, self.size)
         )
+    def move(self):
+        """
+        moving platform
+        """
+        pass
+
 
 
 class Game():
+    """
+    initiate game instance
+    """
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -108,105 +150,110 @@ class Game():
         self.clock = pygame.time.Clock()
         self.my_font = pygame.font.SysFont(FONT_NAME, FONT_PX)
         self.running = True
-        self.player = Player(
-            (148, 548), (10, 50))
-        self.platforms = [
-            Platform(
-                (0, 608), (900, 100)
-            ),
-            Platform(
-                (700, 458), (400, 70)
-            )
-        ]
-        self.boundaries = [
-            Platform(
-                (700, 450), (15, 60), RED
-            ),
-            Platform(
-                (0, 0), (20, HEIGHT)
-            )
-            ]
-        self.boundary = BORDER
-        self._event_loop()
 
-    def _event_loop(self):
-        """
-        pygame event loop
-        """
-        while self.running:
-            self._handle_events()
-            self._update_display()
 
-    def _handle_events(self):
+    def handle_events(self, player):
         """
         definition of all events in the event loop
         """
         for event in pygame.event.get():
-            print(self.player.status)
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 self.running = False
                 pygame.quit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    if self.player.status == 'stationary' or self.player.status == 'move':
-                        self.player.status = 'jumping'
-                        print(self.player.y_body)
-                        self.player.jump_state = 0
-                        print(self.player.jump_state)
-                if event.key == pygame.K_RIGHT or \
-                event.key == pygame.K_LEFT:
-                    if self.player.status == 'stationary':
-                        self.player.status = 'move'
-                    self.player.face = (
+            elif event.type == KEYDOWN:
+                player.trigger = True
+                if event.key == K_SPACE:
+                    if player.status == 'stationary' or player.status == 'move':
+                        player.status = 'jumping'
+                        player.jump_state = 0
+                if event.key == K_RIGHT or \
+                event.key == K_LEFT:
+                    if player.status == 'stationary':
+                        player.status = 'move'
+                    player.face = (
                         'right'
-                        if event.key == pygame.K_RIGHT
+                        if event.key == K_RIGHT
                         else 'left'
                     )
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_RIGHT or\
-                        event.key == pygame.K_LEFT:
-                    if not 'jump' in self.player.status:
-                        self.player.status = 'stationary'
+            elif event.type == KEYUP:
+                if event.key == K_RIGHT or\
+                        event.key == K_LEFT:
+                    player.trigger = False
+                    if not 'jump' in player.status:
+                        player.status = 'stationary'
+                        player.face = 'none'
 
-    def _update_display(self):
+    def update_display(self, platforms, boundaries, player):
         """
         handles screen display updates
         """
         self.screen.fill(WHITE)
-        self._draw_elements()
-        pygame.display.flip()
-
-    def _draw_elements(self):
-        """
-        draw all elements to the screen
-        """
         level = pygame.draw.rect(self.screen, WHITE, (0, 0, WIDTH, HEIGHT), 1)
-        self.player.draw(self.screen, level)
-        for platform in self.platforms:
+        player.draw(self.screen, level)
+        for platform in platforms:
             platform.draw(self.screen)
-        for boundary in self.boundaries:
-            boundary.draw(self.screen)
-        if self.player.status == 'jumping':
-            if self.player.jump_state <= self.player.max_jump:
-                self.player.jump(self.platforms)
-                self.player.jump_state += 1
+        for item in list(boundaries.values()):
+            for boundary in item:
+                boundary.draw(self.screen)
+        if player.status == 'jumping':
+            if player.jump_state <= player.max_jump:
+                player.jump(platforms)
+                player.jump_state += 1
             else:
-                self.player.status = 'jumped'
-            self.player.move(self.boundaries, self.platforms)
-        elif self.player.status == 'jumped':
-            self.player.jump_state -= 1
-            self.player.back_to_floor(self.platforms)
-            self.player.move(self.boundaries, self.platforms)
-        elif self.player.status == 'move':
-            self.player.move(self.boundaries, self.platforms)
-        self.player.draw(self.screen, level)
+                player.status = 'jumped'
+            player.move(platforms, boundaries)
+        elif player.status == 'jumped':
+            player.jump_state -= 1
+            player.back_to_floor(platforms)
+            player.move(platforms, boundaries)
+        elif player.status == 'move':
+            player.move(platforms, boundaries)
+        player.draw(self.screen, level)
+        pygame.display.flip()
 
 
 def main():
     """
     entrypoint
     """
-    Game()
+
+    game = Game()
+    platforms = [
+        Platform(
+            [0, 608], [900, 100], 'left'
+        ),
+        Platform(
+            [700, 470], [400, 76], 'right'
+        ),
+        Platform(
+            [380, 380], [200, 70], 'none'
+        )
+        ]
+    boundaries = {
+        'left': [
+            Platform(
+                [0, 0], [20, HEIGHT]
+            ),
+            Platform(
+                [580, 380], [10, 70]
+            )
+        ],
+        'right': [
+            Platform(
+                [699, 470], [10, 76]
+            ),
+            Platform(
+                [370, 380], [10, 70]
+            )
+        ]
+    }
+    player = Player(
+        [148, 548], [10, 50]
+    )
+
+    while game.running:
+        game.handle_events(player)
+        game.update_display(platforms, boundaries, player)
 
 
 if __name__ == '__main__':
