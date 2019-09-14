@@ -15,10 +15,6 @@ listener.setsockopt(
 )
 listener.bind(("", 37020))
 
-respond = socket(
-    AF_INET, SOCK_STREAM
-)
-
 
 def generate_recieved_addresses():
     listening = True
