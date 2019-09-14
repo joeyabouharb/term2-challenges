@@ -12,18 +12,14 @@ listener.setsockopt(
 )
 listener.bind(("", 37020))
 
-
-response = socket(
+respond = socket(
     AF_INET, SOCK_STREAM
 )
 
-response.bind(("", 37202))
-receiving = True
-while receiving:
-
+listening = True
+while listening:
     data, addr = listener.recvfrom(16)
     location = ":".join(f'{value}' for value in addr)
     print(f"{location} {data.decode('utf8')}")
-    response.connect((addr[0], 37021))
-    response.sendto(b'recieved!', (addr[0], addr[1]))
-    receiving = False
+    
+    listening = False

@@ -29,7 +29,5 @@ while broadcasting:
     # broadcast to clients listening on port 37020
     broadcaster.sendto(output, ('<broadcast>', 37020))
     print("sending IP!")
-    conn, addr = reciever.accept()
-    print('recieved acknowledgement from', addr)
     broadcasting = False
 
