@@ -6,25 +6,28 @@ from socket import (
 import time
 import json
 import datetime
-addresses = {}
-listener = socket(
-    AF_INET, SOCK_DGRAM, IPPROTO_UDP
-)
-listener.setsockopt(
-    SOL_SOCKET, SO_BROADCAST, 1
-)
-listener.bind(("", 37020))
+from minitorrent.services.broadcast import send_broadcast
+def listen_in(addresses):
+    listener = socket(
+        AF_INET, SOCK_DGRAM, IPPROTO_UDP
+    )
 
+    listener.bind(("", 37020))
 
-def generate_recieved_addresses():
     listening = True
     while listening:
         data, addr = listener.recvfrom(16)
-        location = ":".join(f'{value}' for value in addr)
+        ip, port = addr
+        location = f'{ip}:{port}'
         print(f"{location} {data.decode('utf8')}")
-        yield addr
+        addresses[ip] = f'{datetime.datetime.today()}'
+        yield addresses
 
-for addr in generate_recieved_addresses():
-    addresses[addr[0]] = f'{datetime.datetime.today()}'
-    with open('addresses.json', 'w+') as file:
-        json.dump(addresses, file, indent=2)
+
+if __name__ == '__main__':
+    send_broadcast()
+    addresses = {}
+    for item in listen_in(addresses):
+        with open('addresses.json', 'w') as file:
+            json.dump(item, file)
+
