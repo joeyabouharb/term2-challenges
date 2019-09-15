@@ -20,14 +20,16 @@ def listen_in(addresses):
         ip, port = addr
         location = f'{ip}:{port}'
         print(f"{location} {data.decode('utf8')}")
-        addresses[ip] = f'{datetime.datetime.today()}'
+        if str(ip) not in list(addresses.keys()):
+            addresses[ip] = f'{datetime.datetime.today()}'
+            send_broadcast()
         yield addresses
 
 
 if __name__ == '__main__':
     addresses = {}
+    send_broadcast()
     for item in listen_in(addresses):
         with open('addresses.json', 'w') as file:
             json.dump(item, file)
-        send_broadcast()
 

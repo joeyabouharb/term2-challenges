@@ -15,7 +15,7 @@ def send_broadcast():
     broadcaster.setsockopt(
         SOL_SOCKET, SO_BROADCAST, 1
     )
-    broadcaster.settimeout(1)
+
     # bind socket to broadcast at localhost, port 44444
     broadcaster.bind(("", 44444))
     output = b"is broadcasting!"
