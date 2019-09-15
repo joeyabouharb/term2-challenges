@@ -25,9 +25,9 @@ def listen_in(addresses):
 
 
 if __name__ == '__main__':
-    send_broadcast()
     addresses = {}
     for item in listen_in(addresses):
         with open('addresses.json', 'w') as file:
             json.dump(item, file)
+        send_broadcast()
 
