@@ -3,6 +3,7 @@
 import pygame
 from game_globals import *
 from math import cos, sin, pi
+RADIUS = 50
 class Game():
 
     def __init__(self):
@@ -35,15 +36,18 @@ class Game():
         pygame.display.flip()
 
 
-    def _draw_elements(self, n = 3):
-        a, b = (160, 100), (260, 100)
-        top = a[0] + (b[0] - a[0])/2
-        c = (top, 50)
-        d = (top, c[1] + a[1]/2 + 60 + c[1])
-        # pygame.draw.line(self.screen, RED, a, b)
-        pygame.draw.polygon(self.screen, RED, (a, b, c))
-        pygame.draw.rect(self.screen, RED, (*a, b[0] - a[0], 60))
-        pygame.draw.polygon(self.screen, RED, ((a[0], a[1] + 60), (b[0], b[1] + 60), d))
+    def _draw_elements(self, n = 6):
+        pygame.draw.polygon(
+            self.screen, 
+            OFF_COLOR_1,
+            [
+                (
+                    cos(i / n * 2 * pi + pi / 2) * RADIUS + 120,
+                    sin(i / n * 2 * pi + pi / 2) * RADIUS + 100
+                )
+                for i in range(0,n)
+            ]
+        )
 def main():
 
     game = Game()

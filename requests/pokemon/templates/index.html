@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+   <body>
+    <nav>
+      <a href="/"> Home </a>
+    </nav>
+      <section>
+        <nav>
+            {% for name in result %}
+                <a href="{{ name }}">{{ name }}</a>
+            {% endfor %}
+        </nav>
+      </section>
+   </body>
+</html>

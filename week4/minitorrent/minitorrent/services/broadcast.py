@@ -1,4 +1,8 @@
 #! /usr/bin/env python3
+"""
+module responsible for broadcasting on all
+devices on local network
+"""
 from socket import (
     socket, AF_INET, SOCK_DGRAM, IPPROTO_UDP,
     SOL_SOCKET, SO_BROADCAST, SOCK_STREAM
@@ -23,7 +27,8 @@ def send_broadcast():
     while broadcasting:
         # broadcast to clients listening on port 37020
         broadcaster.sendto(output, ('<broadcast>', 37020))
-        print("sending IP!")
+        time.sleep(0.5)
+        # print("sending IP!")
         break
 
 if __name__ == '__main__':

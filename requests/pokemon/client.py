@@ -5,6 +5,19 @@ import requests_cache
 import json
 
 
+class PokemonCache():
+    def __init__(self):
+        self.request_history = {}
+
+    def retrieve_if_available(self, request):
+        """
+        retrieves data from request if availailable
+        """
+        return self.request_history.get(request, None)
+    
+    def save_to(self, request, payload):
+        self.request_history[request] = payload
+
 
 class Client():
     """
@@ -12,54 +25,66 @@ class Client():
     """
     _URL = "https://pokeapi.co/api/v2"
 
-    def __init__(self):
-        requests_cache.install_cache(cache_name='requests', backend='sqlite', expire_after=10000)
+    def __init__(self, cache):
+        # requests_cache.install_cache(
+        #     cache_name='requests', backend='sqlite', expire_after=10000
+        # )
+        self.result = ''
+        self.cache = cache
+        self.count = 0
 
     def get_all(self, item, limit=20, offset=0):
         """
         return all items
         """
-        params = f'?limit={limit}&offset={offset}'
-        r = requests.get(
-            f'{self._URL}/{item}{params}'
-        )
-        if r.status_code == 200:
-            self.result = json.dumps(r.json()['results'], indent=2)
-            self.count = r.json()['count']
-        elif r.status_code == 404:
-            exit(f'{item}. not found. exiting...')
+        req = f'{self._URL}/{item}?limit={limit}&offset={offset}'
+        cached = self.cache.retrieve_if_available(req)
+        if cached is not None:
+            self.result = cached
         else:
-            exit('connection error, exiting')
+            r = requests.get(req)
+            if r.status_code == 200:
+                self.result = r.json()
+                self.count = r.json()['count']
+                self.cache.save_to(req, self.result)
+            else:
+                self.result = r.status_code
+        print(self.result)
 
 
     def find_by_id(self,item, pokeid):
         """
         find item by id
         """
-        r = requests.get(
-            f'{self._URL}/{item}/{pokeid}'
-        )
-        if r.status_code == 200:
-            self.result = json.dumps(r.json(), indent=4)
-        elif r.status_code == 404:
-            exit(f'{item} with id {pokeid} not found. Exiting...')
+        req = f'{self._URL}/{item}/{pokeid}'
+        cached = self.cache.retrieve_if_available(req)
+        if cached is not None:
+            self.result = cached
         else:
-            exit('connection error occured, exiting. ')
+            r = requests.get(req)
+            if r.status_code == 200:
+                self.result = r.json()
+                self.cache.save_to(req, self.result)
+            else:
+                self.result = r.status_code
+
 
 
     def find_by_name(self, item, name):
         """
         find item by name
         """
-        r = requests.get(
-            f'{self._URL}/{item}/{name}'
-        )
-        if r.status_code == 200:
-            self.result = json.dumps(r.json(), indent=4)
-        elif r.status_code == 404:
-            exit(f'{item} with name {name} not found, exiting.')
+        req = f'{self._URL}/{item}/{name}'
+        cached = self.cache.retrieve_if_available(req)
+        if cached is not None:
+            self.result = cached
         else:
-            exit('connection error!')
+            r = requests.get(req)
+            if r.status_code == 200:
+                self.result = r.json()
+                self.cache.save_to(req, self.result)
+            else:
+                self.result = r.status_code
 
 
 if __name__ == '__main__':

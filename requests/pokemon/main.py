@@ -14,13 +14,16 @@ def main(args):
 
     if args.subcommand == 'search':
         if args.id:
-            find_pokemon_by_id(c, args.id, args.item)
+            data = find_pokemon_by_id(c, args.id, args.item)
         elif args.name:
-            find_pokemon_by_name(c, args.name, args.item)
+            data = find_pokemon_by_name(c, args.name, args.item)
         else:
             exit('no search paramaters were entered! exiting...')
     elif args.subcommand == 'list':
-        retrieve_all_pokemon(c, args.limit, args.offset,  args.item)
+        data = retrieve_all_pokemon(
+            c, args.limit, args.offset, args.item
+        )
+    return data
 
 
 def find_pokemon_by_id(c, id, item):
@@ -28,7 +31,7 @@ def find_pokemon_by_id(c, id, item):
     find pokemon by id
     """
     c.find_by_id(item, id)
-    print(c.result)
+    return c.result
 
 
 def find_pokemon_by_name(c, name, item):
@@ -36,16 +39,16 @@ def find_pokemon_by_name(c, name, item):
     find pokemon by name
     """
     c.find_by_name(item, name)
-    print(c.result)
+    return c.result
 
 
-def retrieve_all_pokemon(c, limit, offset, item):
+def retrieve_all_pokemon(c, item, limit=0, offset=0):
     """
     retrieve all pokemon
 """
     c.get_all(item, limit, offset)
     result = c.result
-    print(result)
+    return result
 
 
 if __name__ == '__main__':
@@ -96,5 +99,6 @@ if __name__ == '__main__':
         type=str, default='',
     )
     ARGS = PARSER.parse_args()
+    print(ARGS)
     main(ARGS)
 

@@ -1,0 +1,47 @@
+def x_axis_point(key):
+    return {
+        "key": (value_x, value_y)
+    }.get(key, False)
+
+def y_axis_points(key, xy_point):
+    legend =
+    x_point = {
+        "yyyy/mm/dd": x_pos
+    }.get(key)
+    
+
+def create_element(element_pos, element_size, line_points)
+    return (
+        pygame items
+    )
+
+def create_chart(chart_pos, chart_size, *text_objects):
+    return (
+        pygame rect,
+        pygame texts 
+    )
+
+class App
+    pygame.init()
+    self.running: bool
+    self.screen: pygame screen
+    self.text: pygame text
+    self.page string?
+
+    def update
+        pass
+
+def main
+    app = App()
+
+    while app.running:
+        if app.page == page.input:
+            input_loop(stuff?)
+            app.update(app.screen, objects)
+        if app.page == page.result:
+            chart_loop(processes, ??)
+            app.update(stuff?)
+
+
+def event_loop
+    pass

@@ -1,11 +1,14 @@
 """
 person routes
 """
-from didyoueat.server import app
+from flask import Blueprint
 from didyoueat.read_write import get_lunches
 
+person_routes = Blueprint(
+        'person_route', __name__, url_prefix='/person'
+)
 
-@app.route('/person/<name>', methods=['GET'])
+@person_route.route('/<name>', methods=['GET'])
 def get_person_lunch(name: str):
     """
     get the person's lunch by name

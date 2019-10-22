@@ -2,14 +2,15 @@
 lunches routes
 """
 
-from flask import request
+from flask import request, Blueprint
 from werkzeug.exceptions import HTTPException
 from didyoueat.read_write import get_lunches, update_lunches
-from didyoueat.server import app
 from didyoueat.validators import is_valid_form
 
+lunch_routes = Blueprint('lunch_routes', __name__, url_prefix='/lunches')
 
-@app.route('/lunches/', methods=['GET'])
+
+@lunch_routes.route('', methods=['GET'])
 def get_all_lunches():
     """
     gets all the lunches
@@ -18,7 +19,7 @@ def get_all_lunches():
     return data
 
 
-@app.route('/lunches', methods=['post'])
+@lunch_routes.route('', methods=['post'])
 def post_lunch():
     """
     add new lunch entry
@@ -35,7 +36,7 @@ def post_lunch():
     if not is_valid:
         return message
     lunches = get_lunches()
-    lunches['data'].append({
+    lunches['data'].lunch_routesend({
         'name': name,
         "lunch": lunch
     })
@@ -43,7 +44,7 @@ def post_lunch():
     return message
 
 
-@app.route('/lunches/<name>', methods=['DELETE'])
+@lunch_routes.route('/<name>', methods=['DELETE'])
 def delete_person(name: str):
     """
     delete a person by name
@@ -57,7 +58,7 @@ def delete_person(name: str):
     return f'Successfully deleted {name}'
 
 
-@app.route('/lunches/<meal>')
+@lunch_routes.route('/<meal>')
 def get_persons_who_ate(meal: str):
     """
     get all person's who ate a specific meal
@@ -70,6 +71,6 @@ def get_persons_who_ate(meal: str):
     for data in lunches['data']:
         if data['lunch'] == meal.capitalize():
             result['results'].append(data)
-    return \
-        result if result['results']\
+    return result \
+        if result['results']\
         else 'Not found'
