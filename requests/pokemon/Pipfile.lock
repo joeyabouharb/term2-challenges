@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e1e1dfe93d725353144a27b9d5fa55a3d2376ad09ecc4ed6d3607a52d5b0fe07"
+            "sha256": "33831c76ccec7f9d0858bbe340ce30605427a44431e6e25d6fdad834e7f172cf"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -26,7 +26,7 @@
         },
         "cachecontrol": {
             "extras": [
-                "filecache"
+
             ],
             "hashes": [
                 "sha256:cef77effdf51b43178f6a2d3b787e3734f98ade253fa3187f3bb7315aaa42ff7"
@@ -44,11 +44,11 @@
         },
         "certifi": {
             "hashes": [
-                "sha256:046832c04d4e752f37383b628bc601a7ea7211496b4638f6514d0e5b9acc4939",
-                "sha256:945e3ba63a0b9f577b1395204e13c3a231f9bc0223888be653286534e5873695"
+                "sha256:35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3",
+                "sha256:4ad3232f5e926d6718ec31cfc1fcadfde020920e278684144551c91769c7bc18"
             ],
             "index": "pypi",
-            "version": "==2019.6.16"
+            "version": "==2022.12.7"
         },
         "chardet": {
             "hashes": [
@@ -191,6 +191,14 @@
             ],
             "index": "pypi",
             "version": "==0.8.0"
+        },
+        "setuptools": {
+            "hashes": [
+                "sha256:57f6f22bde4e042978bcd50176fdb381d7c21a9efa4041202288d3737a0c6a54",
+                "sha256:a7620757bf984b58deaf32fc8a4577a9bbc0850cf92c20e1ce41c38c19e5fb75"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==65.6.3"
         },
         "shellingham": {
             "hashes": [
